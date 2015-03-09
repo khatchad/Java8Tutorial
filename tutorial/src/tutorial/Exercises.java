@@ -9,9 +9,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.IntSummaryStatistics;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -19,12 +22,12 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * This test class contains a few cases that are currently marked
- * with {@link Ignore @Ignore}. Remove this tag, implement the test with
- * the Java8 lambda and stream API and run it as a JUnit test.
+ * This test class contains a few cases that are currently marked with
+ * {@link Ignore @Ignore}. Remove this tag, implement the test with the Java8
+ * lambda and stream API and run it as a JUnit test.
  * 
- * Some of the exercises have been adopted from the excellent tutorial
- * by Simon Ritter as given at EclipseCon Europe 2014.
+ * Some of the exercises have been adopted from the excellent tutorial by Simon
+ * Ritter as given at EclipseCon Europe 2014.
  */
 @SuppressWarnings("unused")
 public class Exercises {
@@ -33,18 +36,28 @@ public class Exercises {
 	// lambda syntax. Some of them will actually mutate the input
 	// data. Later exercises aim at pure operations that do not
 	// change any data but transform it instead.
-	
+
 	/**
 	 * Combine the numbers to a string.
 	 */
 	@Test
-	@Ignore
 	public void combineNumbersToString() {
 		final List<Integer> input = Arrays.asList(1, 2, 3, 4, 5, 6);
 
 		final StringBuilder result = new StringBuilder();
-
+		input.forEach(n -> result.append(n));
 		assertEquals("123456", result.toString());
+
+		/*
+		 * TODO: How to do this with a reduction? final StringBuilder result2 =
+		 * new StringBuilder();
+		 * 
+		 * input.stream().reduce((string, number) -> string.append(number),
+		 * (string1, string2) -> string1.append(string2));
+		 * 
+		 * 
+		 * assertEquals("123456", result.toString())
+		 */;
 	}
 
 	/*
@@ -55,11 +68,11 @@ public class Exercises {
 	 * Remove the numbers that are divisible by 3.
 	 */
 	@Test
-	@Ignore
 	public void removeNumbersDivisibleBy3() {
-		final List<Integer> input = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6));
+		final List<Integer> input = new ArrayList<>(Arrays.asList(1, 2, 3, 4,
+				5, 6));
 
-		// TODO code to modify list
+		input.removeIf(n -> n % 3 == 0);
 
 		assertEquals("[1, 2, 4, 5]", input.toString());
 	}
@@ -73,11 +86,10 @@ public class Exercises {
 	 * Replace every number by its value times 10.
 	 */
 	@Test
-	@Ignore
 	public void multiplyBy10() {
 		final List<Integer> input = Arrays.asList(1, 2, 3, 4, 5, 6);
 
-		// TODO code to modify list
+		input.replaceAll(n -> n * 10);
 
 		assertEquals("[10, 20, 30, 40, 50, 60]", input.toString());
 	}
@@ -91,7 +103,6 @@ public class Exercises {
 	 * into a single string, in iteration order.
 	 */
 	@Test
-	@Ignore
 	public void mapToString() {
 		final Map<Integer, Integer> input = new TreeMap<>();
 		input.put(3, 4);
@@ -99,7 +110,9 @@ public class Exercises {
 		input.put(5, 6);
 
 		final StringBuilder result = new StringBuilder();
-		
+
+		input.forEach((k, v) -> result.append(k).append(v));
+
 		assertEquals("123456", result.toString());
 	}
 
@@ -108,17 +121,17 @@ public class Exercises {
 	 */
 
 	/**
-	 * Given a list of numbers, create a map whose key is a boolean if the number
-	 * is even (true) or odd (false) and the value is the sum of all even or odd numbers in the list.
+	 * Given a list of numbers, create a map whose key is a boolean if the
+	 * number is even (true) or odd (false) and the value is the sum of all even
+	 * or odd numbers in the list.
 	 */
 	@Test
-	@Ignore
 	public void mapOfSums() {
 		final List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6);
 		final Map<Boolean, Integer> result = new TreeMap<>();
-
-		// TODO code to populate result
-
+		
+		list.forEach(i -> result.merge(i % 2 == 0, i, (v, n) -> v + n));
+		
 		assertEquals("{false=9, true=12}", result.toString());
 	}
 
@@ -134,7 +147,6 @@ public class Exercises {
 	 * values of all even numbers in the input list.
 	 */
 	@Test
-	@Ignore
 	public void doubleEvenNumbers() {
 		final List<Integer> input = Arrays.asList(1, 2, 3, 4, 5, 6);
 
@@ -147,7 +159,8 @@ public class Exercises {
 	 * Hint 1: Use filter() and map().
 	 */
 	/*
-	 * Hint 2: Use Use collect() to create the result list. See also the java.util.Collectors
+	 * Hint 2: Use Use collect() to create the result list. See also the
+	 * java.util.Collectors
 	 */
 
 	/**
@@ -174,12 +187,14 @@ public class Exercises {
 	/**
 	 * Count the number of prime values in the list.
 	 * 
-	 * Bonus points for functional answer to the question "Is this a prime number?".
+	 * Bonus points for functional answer to the question
+	 * "Is this a prime number?".
 	 */
 	@Test
 	@Ignore
 	public void filterAndCount() throws IOException {
-		final List<Integer> input = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+		final List<Integer> input = Arrays
+				.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 		final long primes = $returnInt$(); // TODO
 
 		assertEquals(4, primes);
@@ -192,18 +207,18 @@ public class Exercises {
 	/**
 	 * Implement the fizz buzz test.
 	 * 
-	 * For the first 100 positive integers, print the word 'fizz'
-	 * for each number divisible by 3, and 'buzz' for each number divisible
-	 * by 5. If the number is divisible
-	 * by 3 and 5, print 'fizzbuzz'. Concatenate to a string delimited by comma.
+	 * For the first 100 positive integers, print the word 'fizz' for each
+	 * number divisible by 3, and 'buzz' for each number divisible by 5. If the
+	 * number is divisible by 3 and 5, print 'fizzbuzz'. Concatenate to a string
+	 * delimited by comma.
 	 */
 	@Test
 	@Ignore
 	public void fizzbuzz() throws IOException {
-		final IntStream allIntegers = IntStream.iterate(1, i->i+1);
-		
+		final IntStream allIntegers = IntStream.iterate(1, i -> i + 1);
+
 		final String result = $implementMe$(); // TODO
-		
+
 		int length = result.length();
 		assertEquals(258, length);
 	}
@@ -219,7 +234,7 @@ public class Exercises {
 	 * Collect the Fibunacci numbers between 100 and 1000 (incl).
 	 * 
 	 * A Fibunacci number is a number that is the sum of its two predecessor
-	 * Fibunacci numbers, e.g. the n'th Fibunacci number is 
+	 * Fibunacci numbers, e.g. the n'th Fibunacci number is
 	 * {@code fib(n) = fib(n-1) + fib(n-2)}.
 	 * 
 	 * The Fibunacci sequence starts with 1, 2, 3, 5.
@@ -233,25 +248,27 @@ public class Exercises {
 	}
 
 	/*
-	 * Hint: Don't forget about anonymous classes if you need state in the stream building.
+	 * Hint: Don't forget about anonymous classes if you need state in the
+	 * stream building.
 	 */
 
 	/**
-	 * Find the biggest number below 10.000 that is the product of 
-	 * two distinct prime numbers.
+	 * Find the biggest number below 10.000 that is the product of two distinct
+	 * prime numbers.
 	 * 
-	 * Bonus points for functional algorithm to identify a number that is a product of two primes.
+	 * Bonus points for functional algorithm to identify a number that is a
+	 * product of two primes.
 	 */
 	@Test
 	@Ignore
 	public void biggestProductOfTwoPrimes() {
-		int biggest = $returnInt$(); // TODO 
+		int biggest = $returnInt$(); // TODO
 		assertEquals(9998, biggest);
 	}
-	
+
 	/**
-	 * Count the numbers below 500 that are the product of 
-	 * two distinct prime numbers.
+	 * Count the numbers below 500 that are the product of two distinct prime
+	 * numbers.
 	 */
 	@Test
 	@Ignore
@@ -259,10 +276,10 @@ public class Exercises {
 		long count = $returnInt$(); // TODO
 		assertEquals(145, count);
 	}
-	
+
 	/**
-	 * Count the numbers below 1_000.000 that are the product of 
-	 * two distinct prime numbers.
+	 * Count the numbers below 1_000.000 that are the product of two distinct
+	 * prime numbers.
 	 */
 	@Test
 	@Ignore
@@ -270,11 +287,11 @@ public class Exercises {
 		long count = $returnInt$();
 		assertEquals(209_867, count);
 	}
-	
+
 	/*
 	 * Hint: Use parallel streams to speed up the computation.
 	 */
-	
+
 	/**
 	 * Given two lists of Integer, compute a third list where each element is
 	 * the difference between the corresponding elements of the two input lists
@@ -302,7 +319,8 @@ public class Exercises {
 	/**
 	 * Convert a list of numbers into a list of their prime factors.
 	 * 
-	 * Bonus points for functional implementation to obtain the list of prime numbers.
+	 * Bonus points for functional implementation to obtain the list of prime
+	 * numbers.
 	 */
 	@Test
 	@Ignore
@@ -319,15 +337,15 @@ public class Exercises {
 	 * Hint: Use Stream.flatMap().
 	 */
 
-
 	/**
-	 * Convert a list of numbers into a list of prime factors and return
-	 * the distinct, odd prime factors sorted descending.
+	 * Convert a list of numbers into a list of prime factors and return the
+	 * distinct, odd prime factors sorted descending.
 	 */
 	@Test
 	@Ignore
 	public void oddPrimeFactorsSorted() throws IOException {
-		List<Integer> input = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
+		List<Integer> input = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+				12, 13, 14, 15, 16, 17, 18, 19, 20);
 
 		List<Integer> result = $implementMe$();
 		assertEquals("[19, 17, 13, 11, 7, 5, 3]", result.toString());
@@ -341,9 +359,9 @@ public class Exercises {
 	 */
 
 	/**
-	 * Count the total number of prime factors of the numbers between 1 and 10000 (incl),
-	 * the _distinct_ number of prime factors and the distinct number of prime factors,
-	 * that are also Fibunacci numbers.
+	 * Count the total number of prime factors of the numbers between 1 and
+	 * 10000 (incl), the _distinct_ number of prime factors and the distinct
+	 * number of prime factors, that are also Fibunacci numbers.
 	 */
 	@Test
 	@Ignore
@@ -356,13 +374,13 @@ public class Exercises {
 		assertEquals("distinct count", 1229, distinctCount);
 		assertEquals("total count", 31985, totalCount);
 	}
-	
+
 	/*
 	 * Hint 1: Use Stream.peek().
 	 */
 	/*
-	 * Hint 2: Use LongAdder, IntSummeryStatistics or AtomicLong/AtomicInteger to allow peek() to have
-	 * side effects.
+	 * Hint 2: Use LongAdder, IntSummeryStatistics or AtomicLong/AtomicInteger
+	 * to allow peek() to have side effects.
 	 */
 
 	/**
@@ -386,14 +404,14 @@ public class Exercises {
 	/**
 	 * Categorize the numbers between 1 and 100 according to the fizzbuzz rules
 	 * but only keep the count of the numbers that fall into each criteria. Also
-	 * count the numbers that do not match the fizzbuzz rules into a category
-	 * '' (the empty string).
+	 * count the numbers that do not match the fizzbuzz rules into a category ''
+	 * (the empty string).
 	 */
 	@Test
 	@Ignore
 	public void fizzbuzzCounting() throws IOException {
 		Map<String, Long> result = $implementMe$(); // TODO
-		
+
 		assertEquals(27, result.get("fizz").longValue());
 		assertEquals(14, result.get("buzz").longValue());
 		assertEquals(6, result.get("fizzbuzz").longValue());
